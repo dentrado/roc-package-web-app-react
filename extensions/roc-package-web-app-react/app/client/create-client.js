@@ -171,33 +171,35 @@ export default function createClient({
 
         let updateScroll = () => {};
 
+        const middlewares = [
+            routerMiddlewareConfig['react-router-scroll-async'].disabled !== true && useScroll({
+                ...routerMiddlewareConfig['react-router-scroll-async'],
+                updateScroll: (cb) => { updateScroll = cb; },
+            }),
+            routerMiddlewareConfig['react-router-redial'].disabled !== true && useRedial({
+                ...routerMiddlewareConfig['react-router-redial'],
+                locals,
+                initialLoading,
+                beforeTransition: rocConfig.runtime.fetch.client.beforeTransition,
+                afterTransition: rocConfig.runtime.fetch.client.afterTransition,
+                parallel: rocConfig.runtime.fetch.client.parallel,
+                onCompleted: (type) => {
+                    if (type === 'beforeTransition') {
+                        updateScroll();
+                    }
+
+                    if (routerMiddlewareConfig['react-router-redial'].onCompleted) {
+                        routerMiddlewareConfig['react-router-redial'].onCompleted(type);
+                    }
+                },
+            }),
+        ].filter(Boolean);
+
         const finalComponent = compose(createComponent)(
             <Router
                 history={history}
                 routes={routes}
-                render={applyRouterMiddleware(
-                    useScroll({
-                        ...routerMiddlewareConfig['react-router-scroll-async'],
-                        updateScroll: (cb) => { updateScroll = cb; },
-                    }),
-                    useRedial({
-                        ...routerMiddlewareConfig['react-router-redial'],
-                        locals,
-                        initialLoading,
-                        beforeTransition: rocConfig.runtime.fetch.client.beforeTransition,
-                        afterTransition: rocConfig.runtime.fetch.client.afterTransition,
-                        parallel: rocConfig.runtime.fetch.client.parallel,
-                        onCompleted: (type) => {
-                            if (type === 'beforeTransition') {
-                                updateScroll();
-                            }
-
-                            if (routerMiddlewareConfig['react-router-redial'].onCompleted) {
-                                routerMiddlewareConfig['react-router-redial'].onCompleted(type);
-                            }
-                        },
-                    }),
-                )}
+                render={applyRouterMiddleware(...middlewares)}
             />
         );
 
