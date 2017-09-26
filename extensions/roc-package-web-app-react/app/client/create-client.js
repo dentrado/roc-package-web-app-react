@@ -10,7 +10,6 @@ import createHistory from 'history/lib/createBrowserHistory';
 import { supportsHistory } from 'history/lib/DOMUtils';
 import debug from 'debug';
 import { useRedial } from 'react-router-redial';
-import useScroll from 'react-router-scroll-async/lib/useScroll';
 
 import { rocConfig } from '../shared/universal-config';
 
@@ -172,11 +171,7 @@ export default function createClient({
         let updateScroll = () => {};
 
         const middlewares = [
-            routerMiddlewareConfig['react-router-scroll-async'].disabled !== true && useScroll({
-                ...routerMiddlewareConfig['react-router-scroll-async'],
-                updateScroll: (cb) => { updateScroll = cb; },
-            }),
-            routerMiddlewareConfig['react-router-redial'].disabled !== true && useRedial({
+            useRedial({
                 ...routerMiddlewareConfig['react-router-redial'],
                 locals,
                 initialLoading,
@@ -193,7 +188,17 @@ export default function createClient({
                     }
                 },
             }),
-        ].filter(Boolean);
+        ];
+
+        if(USE_REACT_ROUTER_SCROLL_ASYNC) {
+            const useScroll = require('react-router-scroll-async/lib/useScroll');
+            middlewares.unshift(
+                useScroll({
+                    ...routerMiddlewareConfig['react-router-scroll-async'],
+                    updateScroll: (cb) => { updateScroll = cb; },
+                })
+            );
+        }
 
         const finalComponent = compose(createComponent)(
             <Router

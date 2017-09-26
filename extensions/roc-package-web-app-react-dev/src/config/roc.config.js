@@ -19,6 +19,10 @@ export default {
                 locales: [],
             },
 
+            reactRouterScrollAsync: {
+                enabled: true,
+            },
+
             routes: 'src/routes/routes.js',
             useDefaultRoutes: true,
 
