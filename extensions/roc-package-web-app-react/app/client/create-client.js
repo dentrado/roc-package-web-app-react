@@ -1,5 +1,5 @@
 /* global __DEV__, HAS_CLIENT_LOADING, ROC_CLIENT_LOADING, ROC_PATH, HAS_REDUX_REDUCERS, document, window,
- HAS_REDUX_SAGA, REDUX_SAGAS, I18N_LOCALES, USE_I18N_POLYFILL */
+ HAS_REDUX_SAGA, REDUX_SAGAS, I18N_LOCALES, USE_I18N_POLYFILL, USE_REACT_ROUTER_SCROLL_ASYNC */
 /* eslint-disable global-require */
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -190,8 +190,9 @@ export default function createClient({
             }),
         ];
 
-        if(USE_REACT_ROUTER_SCROLL_ASYNC) {
+        if (USE_REACT_ROUTER_SCROLL_ASYNC) {
             const useScroll = require('react-router-scroll-async/lib/useScroll');
+
             middlewares.unshift(
                 useScroll({
                     ...routerMiddlewareConfig['react-router-scroll-async'],
